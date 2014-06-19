@@ -1,9 +1,11 @@
 package ethier.alex.resistance;
 
 import ethier.alex.world.addon.FilterListBuilder;
-import ethier.alex.world.core.data.*;
+import ethier.alex.world.core.data.ElementList;
+import ethier.alex.world.core.data.FilterList;
+import ethier.alex.world.core.data.Partition;
 import ethier.alex.world.core.processor.SimpleProcessor;
-import ethier.alex.world.processor.Query;
+import ethier.alex.world.query.Query;
 import java.util.*;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.BasicConfigurator;
@@ -56,10 +58,10 @@ public class ResistanceTest {
         round2Players.add("liz");
         game.playRound(round2Players, 1);
         
-//        Set<String> round3Players = new HashSet<String>();
-//        round3Players.add("alex");
-//        round3Players.add("liban");
-//        game.playRound(round3Players, 1);
+        Set<String> round3Players = new HashSet<String>();
+        round3Players.add("alex");
+        round3Players.add("liban");
+        game.playRound(round3Players, 1);
 
         Partition gamePartition = game.createRootPartition();
 
@@ -88,6 +90,8 @@ public class ResistanceTest {
             double probSpy = queryManager.query(query);
             logger.info("Player: " + player + " has probability of being a spy: " + probSpy);
         }
+        
+        logger.info("World Size: " + queryManager.getWorldSize());
         
     }
 }
