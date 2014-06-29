@@ -47,10 +47,10 @@ public class Game {
         spies = mySpies;
 
         logger.info("Player Map");
-        for (int i=0; i < myPlayers.size(); i++) {
+        for (int i = 0; i < myPlayers.size(); i++) {
             String player = myPlayers.get(i);
             logger.info(player + " <=> " + i);
-            
+
             players.put(player, i);
         }
 
@@ -66,97 +66,87 @@ public class Game {
 
         this.createGameFilters();
     }
-    
+
     public void assumeResistance(String player) {
         int playerOffset = players.get(player);
-        
+
         String filterStr = StringUtils.leftPad("", radices.length, "*");
         filterStr = filterStr.substring(0, playerOffset) + "1" + filterStr.substring(playerOffset + 1);
-        
-        FilterList filter = FilterListBuilder.newInstance()
-            .setQuick(filterStr)
-            .getFilterList();
-        
+
+        FilterList filter = FilterListBuilder.newInstance().setQuick(filterStr).getFilterList();
+
         filters.add(filter);
         logger.info("Adding assume resistance filter: " + filter);
     }
-    
+
     // If one player accuses another players vote, remove the possiblity that the accuser is resistance and the vote is a fail
     public void applyVoteVouch(String voucher, String voucheeVote, int myRoundCount) {
         int playerOffset = players.get(voucher);
-        int voucheeVoteOffset = players.get(voucheeVote) + (myRoundCount + 1)*players.size();
-        
+        int voucheeVoteOffset = players.get(voucheeVote) + (myRoundCount + 1) * players.size();
+
         String filterStr = StringUtils.leftPad("", radices.length, "*");
-        
+
         filterStr = filterStr.substring(0, playerOffset) + "0" + filterStr.substring(playerOffset + 1);
         filterStr = filterStr.substring(0, voucheeVoteOffset) + "1" + filterStr.substring(voucheeVoteOffset + 1);
-        
-        FilterList filter = FilterListBuilder.newInstance()
-                .setQuick(filterStr)
-                .getFilterList();
-        
+
+        FilterList filter = FilterListBuilder.newInstance().setQuick(filterStr).getFilterList();
+
         filters.add(filter);
         logger.info("Adding vote vouch filter: " + filter);
     }
-    
+
     // If one player accuses another players vote, remove the possiblity that the accuser is resistance and the vote is pass
     public void applyVoteAccusation(String accuser, String accuseeVote, int myRoundCount) {
         int playerOffset = players.get(accuser);
-        int accuseeVoteOffset = players.get(accuseeVote) + (myRoundCount + 1)*players.size();
-        
+        int accuseeVoteOffset = players.get(accuseeVote) + (myRoundCount + 1) * players.size();
+
         String filterStr = StringUtils.leftPad("", radices.length, "*");
-        
+
         filterStr = filterStr.substring(0, playerOffset) + "0" + filterStr.substring(playerOffset + 1);
         filterStr = filterStr.substring(0, accuseeVoteOffset) + "0" + filterStr.substring(accuseeVoteOffset + 1);
-        
-        FilterList filter = FilterListBuilder.newInstance()
-                .setQuick(filterStr)
-                .getFilterList();
-        
+
+        FilterList filter = FilterListBuilder.newInstance().setQuick(filterStr).getFilterList();
+
         filters.add(filter);
         logger.info("Adding vote accusation filter: " + filter);
     }
-    
+
     // If one player accuses another of being a spy, remove the possiblity that they are both resistance
     public void applyAccustion(String player1, String player2) {
         int[] playerOffsets = new int[2];
-        
+
         playerOffsets[0] = players.get(player1);
         playerOffsets[1] = players.get(player2);
-        
+
         String filterStr = StringUtils.leftPad("", radices.length, "*");
-        
-        for(int playerOffset : playerOffsets) {
+
+        for (int playerOffset : playerOffsets) {
             filterStr = filterStr.substring(0, playerOffset) + "0" + filterStr.substring(playerOffset + 1);
         }
-        
-        FilterList filter = FilterListBuilder.newInstance()
-                .setQuick(filterStr)
-                .getFilterList();
-        
+
+        FilterList filter = FilterListBuilder.newInstance().setQuick(filterStr).getFilterList();
+
         filters.add(filter);
         logger.info("Adding accusation filter: " + filter);
     }
-    
+
     // If one player vouches for another, the vouchee cannot be a spy if the voucher is resistance.
     public void applyVouch(String voucher, String vouchee) {
-        
+
         int voucherOffset = players.get(voucher);
         int voucheeOffset = players.get(vouchee);
-        
+
         String filterStr = StringUtils.leftPad("", radices.length, "*");
-        
+
         filterStr = filterStr.substring(0, voucherOffset) + "0" + filterStr.substring(voucherOffset + 1);
         filterStr = filterStr.substring(0, voucheeOffset) + "1" + filterStr.substring(voucheeOffset + 1);
-        
-        FilterList filter = FilterListBuilder.newInstance()
-                .setQuick(filterStr)
-                .getFilterList();
-        
+
+        FilterList filter = FilterListBuilder.newInstance().setQuick(filterStr).getFilterList();
+
         filters.add(filter);
         logger.info("Adding vouch filter: " + filter);
     }
-    
+
     public void createGameFilters() {
         // Create the rule that only x number of spies exist
         int[] playerRadices = new int[players.size()];
@@ -179,46 +169,36 @@ public class Game {
             int combOnes = StringUtils.countMatches(genFilterStr, "1");
             if (combOnes != spies) {
                 String filterStr = StringUtils.rightPad(genFilterStr, radices.length, "*");
-                FilterList newFilter = FilterListBuilder.newInstance()
-                        .setQuick(filterStr)
-                        .getFilterList();
-                
+                FilterList newFilter = FilterListBuilder.newInstance().setQuick(filterStr).getFilterList();
+
                 filters.add(newFilter);
                 logger.info("Adding base filter: " + newFilter);
             }
 
             count++;
         }
-        
+
         //Create rules that resistance do not throw fails
-        for(int i=0; i < players.size();i++) {
+        for (int i = 0; i < players.size(); i++) {
             String baseFilterStr = StringUtils.leftPad("", radices.length, "*");
-            
-            baseFilterStr = baseFilterStr.substring(0, i) + "0" + baseFilterStr.substring(i+1);
-            
-            for(int j=0; j < roundVotes.length; j++) {
-                int missionOffset = (j+1)*players.size() + i;
-                
-                String filterStr = baseFilterStr.substring(0, missionOffset) + "1" + baseFilterStr.substring(missionOffset+1);
-                
-                FilterList newFilter = FilterListBuilder.newInstance()
-                    .setQuick(filterStr)
-                    .getFilterList();
-            
+
+            baseFilterStr = baseFilterStr.substring(0, i) + "0" + baseFilterStr.substring(i + 1);
+
+            for (int j = 0; j < roundVotes.length; j++) {
+                int missionOffset = (j + 1) * players.size() + i;
+
+                String filterStr = baseFilterStr.substring(0, missionOffset) + "1" + baseFilterStr.substring(missionOffset + 1);
+
+                FilterList newFilter = FilterListBuilder.newInstance().setQuick(filterStr).getFilterList();
+
                 logger.info("Adding base filter: " + newFilter);
                 filters.add(newFilter);
             }
-        }        
+        }
     }
-    
-    
 
     public Partition createRootPartition() {
-        return PartitionBuilder.newInstance()
-                .setBlankWorld()
-                .setRadices(radices)
-                .addFilters(filters)
-                .getPartition();
+        return PartitionBuilder.newInstance().setBlankWorld().setRadices(radices).addFilters(filters).getPartition();
     }
 
 //    public Collection<FilterList> getFilters() {
@@ -235,13 +215,65 @@ public class Game {
         Collection<FilterList> filters = new ArrayList<FilterList>();
 
         // Add filters due to vote outcome
-        HashSet<Integer> voteFilterOffsets = this.generateVoteFilterOffsets(agents);
-        Collection<String> voteFilterStrings = this.generateVoteFilterStrings(failures);
-        this.createVoteFilters(voteFilterStrings, voteFilterOffsets);
+//        HashSet<Integer> voteFilterOffsets = this.generateRoundPlayerFilterOffsets(agents);
+//        Collection<String> voteFilterStrings = this.generateRoundPlayerFilterStrings(failures);
+//        this.createRoundPlayerFilters(voteFilterStrings, voteFilterOffsets);
+
+        this.createVoteFilters(agents, failures);
 
         //Add filters due to the players sent on the mission.
         this.createMissionFilters(agents);
         roundCount++;
+    }
+
+    // Filter out all combinations that do not contain the proper number of failure votes.
+    public void createVoteFilters(Set<String> agents, int failures) {
+
+        TreeMap<Integer, Integer> playerMap = new TreeMap<Integer, Integer>();
+
+        Iterator<String> it = agents.iterator();
+        for (int i = 0; i < agents.size(); i++) {
+            String agent = it.next();
+
+            int playerOffset = players.get(agent);
+            playerMap.put(i, playerOffset);
+        }
+
+        int numRoundVotes = agents.size();
+
+        String breakStr = "";
+        for (int i = 0; i < numRoundVotes; i++) {
+            breakStr += '1';
+        }
+
+        String permutationStr = "";
+        int count = 0;
+        while (!permutationStr.equals(breakStr)) {
+
+            permutationStr = "" + Integer.toBinaryString(count);
+            permutationStr = StringUtils.leftPad(permutationStr, numRoundVotes, '0');
+            int combOnes = StringUtils.countMatches(permutationStr, "1");
+            if (combOnes != failures) {
+
+                char[] filterChars = permutationStr.toCharArray();
+                Iterator<Integer> playerMapIt = playerMap.keySet().iterator();
+                String filterStr = StringUtils.leftPad("", radices.length, "*");
+                for (int i = 0; i < numRoundVotes; i++) {
+                    int playerOffset = playerMap.get(playerMapIt.next());
+                    char filterChar = filterChars[i];
+
+                    int offset = (1 + roundCount) * players.size() + playerOffset;
+                    filterStr = filterStr.substring(0, offset) + filterChar + filterStr.substring(offset + 1);
+                }
+
+                FilterList filter = FilterListBuilder.newInstance().setQuick(filterStr).getFilterList();
+
+                logger.info("Adding vote filter: " + filter);
+                filters.add(filter);
+            }
+
+            count++;
+        }
     }
 
     //2 == player did not go on mission.  We remove these cases for the players that did/did not go.
@@ -251,26 +283,24 @@ public class Game {
 
         for (int i = 0; i < players.size(); i++) {
             String agentStr = inversePlayers.get(i);
-            
+
             if (agents.contains(agentStr)) {
                 //If an agent is on the mission exclude the possibility they did not vote
                 StringBuilder filterStringBuilder = new StringBuilder();
-                
+
                 int missionOffset = (roundCount + 1) * players.size() + i;
                 filterStringBuilder.append(StringUtils.leftPad("", missionOffset, "*"));
                 filterStringBuilder.append("2");
                 filterStringBuilder.append(StringUtils.leftPad("", radices.length - missionOffset - 1, "*"));
-                
-                FilterList newFilter = FilterListBuilder.newInstance()
-                        .setQuick(filterStringBuilder.toString())
-                        .getFilterList();
-                
+
+                FilterList newFilter = FilterListBuilder.newInstance().setQuick(filterStringBuilder.toString()).getFilterList();
+
                 logger.info("Adding Mission Filter: " + newFilter);
                 filters.add(newFilter);
             } else {
                 //If a player did not go on the mission, exclude the possibilities of them casting votes.
-                for(int j=0; j < 2;j++) {
-                    
+                for (int j = 0; j < 2; j++) {
+
                     StringBuilder filterStringBuilder = new StringBuilder();
 
                     int missionOffset = (roundCount + 1) * players.size() + i;
@@ -278,9 +308,7 @@ public class Game {
                     filterStringBuilder.append(j);
                     filterStringBuilder.append(StringUtils.leftPad("", radices.length - missionOffset - 1, "*"));
 
-                    FilterList newFilter = FilterListBuilder.newInstance()
-                            .setQuick(filterStringBuilder.toString())
-                            .getFilterList();
+                    FilterList newFilter = FilterListBuilder.newInstance().setQuick(filterStringBuilder.toString()).getFilterList();
 
                     logger.info("Adding Mission Filter: " + newFilter);
                     filters.add(newFilter);
@@ -289,21 +317,7 @@ public class Game {
         }
     }
 
-//    public HashSet<Integer> generateMissionOffsets(Set<String> agents) {
-//
-//        int baseMissionOffset = players.size() * roundCount;
-//        HashSet<Integer> missionOffsets = new HashSet<Integer>();
-//
-//        for (String agent : agents) {
-//            int agentOffset = players.get(agent);
-//
-//            int missionOffset = baseMissionOffset + agentOffset;
-//            missionOffsets.add(missionOffset);
-//        }
-//
-//        return missionOffsets;
-//    }
-    public void createVoteFilters(Collection<String> voteFilterStrings, HashSet<Integer> voteFilterOffsets) {
+    public void createRoundPlayerFilters(Collection<String> voteFilterStrings, HashSet<Integer> voteFilterOffsets) {
 
         for (String voteFilterString : voteFilterStrings) {
             StringBuilder filterStringBuilder = new StringBuilder();
@@ -320,10 +334,8 @@ public class Game {
                 }
             }
 
-            FilterList newFilter = FilterListBuilder.newInstance()
-                    .setQuick(filterStringBuilder.toString())
-                    .getFilterList();
-            
+            FilterList newFilter = FilterListBuilder.newInstance().setQuick(filterStringBuilder.toString()).getFilterList();
+
             logger.info("Adding vote Filter: " + newFilter);
             filters.add(newFilter);
         }
@@ -331,7 +343,7 @@ public class Game {
 
     //Used in conjunction with the output of 'generateVoteFilterStrings'
     //Gives the offset values to transform the strings into filters.
-    public HashSet<Integer> generateVoteFilterOffsets(Set<String> agents) {
+    public HashSet<Integer> generateRoundPlayerFilterOffsets(Set<String> agents) {
 
         HashSet<Integer> voteFilterOffsets = new HashSet<Integer>();
 
@@ -341,41 +353,5 @@ public class Game {
         }
 
         return voteFilterOffsets;
-    }
-
-    //Generates a string that represents the filters that should be created.  1 = spy, 0 = resistance.
-    //These set of filters are based on the outcome of the votes after a mission outcome is seen.
-    public Collection<String> generateVoteFilterStrings(int failures) {
-
-        int numVotes = roundVotes[roundCount];
-
-        Collection<String> filterStrings = new ArrayList<String>();
-        int[] voteRadices = new int[numVotes];
-
-        String breakStr = "";
-        for (int i = 0; i < numVotes; i++) {
-            breakStr += '1';
-            voteRadices[i] = 2;
-        }
-
-        String filterStr = "";
-        int count = 0;
-        while (true) {
-            if (filterStr.equals(breakStr)) {
-                break;
-            }
-
-            filterStr = "" + Integer.toBinaryString(count);
-            filterStr = StringUtils.leftPad(filterStr, numVotes, '0');
-            int combOnes = StringUtils.countMatches(filterStr, "1");
-            if (combOnes < failures) {
-                filterStrings.add(filterStr);
-            }
-
-
-            count++;
-        }
-
-        return filterStrings;
     }
 }
