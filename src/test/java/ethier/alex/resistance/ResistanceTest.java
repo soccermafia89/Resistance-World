@@ -4,8 +4,9 @@ import ethier.alex.world.addon.FilterListBuilder;
 import ethier.alex.world.core.data.ElementList;
 import ethier.alex.world.core.data.FilterList;
 import ethier.alex.world.core.data.Partition;
+import ethier.alex.world.core.processor.Processor;
 import ethier.alex.world.core.processor.SimpleProcessor;
-import ethier.alex.world.query.Wizard;
+import ethier.alex.world.query.SimpleQuery;
 import java.util.*;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.BasicConfigurator;
@@ -90,11 +91,12 @@ public class ResistanceTest {
 
         Partition gamePartition = game.createRootPartition();
 
-        SimpleProcessor simpleProcessor = new SimpleProcessor(gamePartition);
+        Processor simpleProcessor = new SimpleProcessor(gamePartition);
+//        simpleProcessor.setPartition(gamePartition);
         simpleProcessor.runAll();
         Collection<ElementList> elements = simpleProcessor.getCompletedPartitions();
 
-        Wizard wizard = new Wizard(gamePartition.getRadices(), elements);
+        SimpleQuery wizard = new SimpleQuery(gamePartition.getRadices(), elements);
         for (int i = 0; i < players.size(); i++) {
             String player = players.get(i);
 
@@ -170,11 +172,12 @@ public class ResistanceTest {
 
         Partition gamePartition = game.createRootPartition();
 
-        SimpleProcessor simpleProcessor = new SimpleProcessor(gamePartition);
+        Processor simpleProcessor = new SimpleProcessor(gamePartition);
+//        simpleProcessor.setPartition(gamePartition);
         simpleProcessor.runAll();
         Collection<ElementList> elements = simpleProcessor.getCompletedPartitions();
 
-        Wizard wizard = new Wizard(gamePartition.getRadices(), elements);
+        SimpleQuery wizard = new SimpleQuery(gamePartition.getRadices(), elements);
         for (int i = 0; i < players.size(); i++) {
             String player = players.get(i);
 
@@ -229,7 +232,8 @@ public class ResistanceTest {
 
         Partition gamePartition = game.createRootPartition();
 
-        SimpleProcessor simpleProcessor = new SimpleProcessor(gamePartition);
+        Processor simpleProcessor = new SimpleProcessor(gamePartition);
+//        simpleProcessor.setPartition(gamePartition);
         simpleProcessor.runAll();
         Collection<ElementList> elements = simpleProcessor.getCompletedPartitions();
 //        for (ElementList element : elements) {
@@ -237,7 +241,7 @@ public class ResistanceTest {
 //        }
 
 
-        Wizard wizard = new Wizard(gamePartition.getRadices(), elements);
+        SimpleQuery wizard = new SimpleQuery(gamePartition.getRadices(), elements);
         for (int i = 0; i < players.size(); i++) {
             String player = players.get(i);
 
