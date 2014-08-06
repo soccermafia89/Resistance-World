@@ -55,7 +55,7 @@
         <dependency>
             <groupId>ethier.alex</groupId>
             <artifactId>enum-world</artifactId>
-            <version>2.0.0</version>
+            <version>3.0.0-SNAPSHOT</version>
             <type>jar</type>
         </dependency>
     </dependencies>

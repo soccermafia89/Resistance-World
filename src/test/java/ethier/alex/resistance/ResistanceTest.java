@@ -4,6 +4,7 @@ import ethier.alex.world.addon.FilterListBuilder;
 import ethier.alex.world.core.data.ElementList;
 import ethier.alex.world.core.data.FilterList;
 import ethier.alex.world.core.data.Partition;
+import ethier.alex.world.core.processor.DeepProcessor;
 import ethier.alex.world.core.processor.Processor;
 import ethier.alex.world.core.processor.SimpleProcessor;
 import ethier.alex.world.query.SimpleQuery;
@@ -91,10 +92,11 @@ public class ResistanceTest {
 
         Partition gamePartition = game.createRootPartition();
 
-        Processor simpleProcessor = new SimpleProcessor(gamePartition);
+        Processor processor = new DeepProcessor();
+        processor.setPartition(gamePartition);
 //        simpleProcessor.setPartition(gamePartition);
-        simpleProcessor.runAll();
-        Collection<ElementList> elements = simpleProcessor.getCompletedPartitions();
+        processor.runAll();
+        Collection<ElementList> elements = processor.getCompletedPartitions();
 
         SimpleQuery wizard = new SimpleQuery(gamePartition.getRadices(), elements);
         for (int i = 0; i < players.size(); i++) {
@@ -172,10 +174,11 @@ public class ResistanceTest {
 
         Partition gamePartition = game.createRootPartition();
 
-        Processor simpleProcessor = new SimpleProcessor(gamePartition);
+        Processor processor = new DeepProcessor();
+        processor.setPartition(gamePartition);
 //        simpleProcessor.setPartition(gamePartition);
-        simpleProcessor.runAll();
-        Collection<ElementList> elements = simpleProcessor.getCompletedPartitions();
+        processor.runAll();
+        Collection<ElementList> elements = processor.getCompletedPartitions();
 
         SimpleQuery wizard = new SimpleQuery(gamePartition.getRadices(), elements);
         for (int i = 0; i < players.size(); i++) {
@@ -232,10 +235,11 @@ public class ResistanceTest {
 
         Partition gamePartition = game.createRootPartition();
 
-        Processor simpleProcessor = new SimpleProcessor(gamePartition);
+        Processor processor = new DeepProcessor();
+        processor.setPartition(gamePartition);
 //        simpleProcessor.setPartition(gamePartition);
-        simpleProcessor.runAll();
-        Collection<ElementList> elements = simpleProcessor.getCompletedPartitions();
+        processor.runAll();
+        Collection<ElementList> elements = processor.getCompletedPartitions();
 //        for (ElementList element : elements) {
 //            System.out.println("Element Found: " + element);
 //        }
