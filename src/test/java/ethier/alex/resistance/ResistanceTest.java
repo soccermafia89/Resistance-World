@@ -10,11 +10,15 @@ import ethier.alex.world.core.processor.SimpleProcessor;
 import ethier.alex.world.query.SimpleQuery;
 import java.util.*;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.BasicConfigurator;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.core.LoggerContext;
+import org.apache.logging.log4j.core.config.Configuration;
+import org.apache.logging.log4j.core.config.LoggerConfig;
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.junit.Assert;
 
 /**
 
@@ -22,11 +26,11 @@ import org.junit.Assert;
  */
 public class ResistanceTest {
 
-    private static Logger logger = Logger.getLogger(ResistanceTest.class);
+    private static Logger logger = LogManager.getLogger(ResistanceTest.class);
 
     @BeforeClass
     public static void setUpClass() {
-        BasicConfigurator.configure();
+//        BasicConfigurator.configure();
     }
 
     @Test
@@ -38,6 +42,8 @@ public class ResistanceTest {
         System.out.println("********************************************");
         System.out.println("");
         System.out.println("");
+        
+        this.setLogLevel(Level.TRACE);
 
         List<String> players = new ArrayList<String>();
         players.add("alex");
@@ -127,6 +133,8 @@ public class ResistanceTest {
         System.out.println("********************************************");
         System.out.println("");
         System.out.println("");
+        
+        this.setLogLevel(Level.TRACE);
 
         List<String> players = new ArrayList<String>();
         players.add("alex");
@@ -174,7 +182,8 @@ public class ResistanceTest {
 
         Partition gamePartition = game.createRootPartition();
 
-        Processor processor = new DeepProcessor();
+        Processor processor = new SimpleProcessor();
+//        Processor processor = new DeepProcessor();
         processor.setPartition(gamePartition);
 //        simpleProcessor.setPartition(gamePartition);
         processor.runAll();
@@ -214,6 +223,8 @@ public class ResistanceTest {
         System.out.println("********************************************");
         System.out.println("");
         System.out.println("");
+        
+        this.setLogLevel(Level.TRACE);
 
         List<String> players = new ArrayList<String>();
         players.add("alex");
@@ -269,5 +280,14 @@ public class ResistanceTest {
         }
 
         logger.info("World Size: " + wizard.getWorldSize());
+    }
+    
+    private void setLogLevel(Level level) {
+        //Since logging significantly effects performance metrics, raise the level.
+        LoggerContext ctx = (LoggerContext) LogManager.getContext(false);
+        Configuration config = ctx.getConfiguration();
+        LoggerConfig loggerConfig = config.getLoggerConfig("ethier.alex");
+            loggerConfig.setLevel(level);
+        ctx.updateLoggers();  // This causes all Loggers to refetch information
     }
 }
